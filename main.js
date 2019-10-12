@@ -22,11 +22,11 @@
   // - 戻り値
   //   - `input[type="text"]`から取得した文字列を返す
   function pickupTodoFromTextBox() {
-    const todo = inputElement;
+    const todo = inputElement.value;
     inputElement.value = '';
 
     return todo;
-  };
+  }
 
   // `validateTodo関数` を実装する
   // - 実現したい機能
@@ -38,22 +38,17 @@
   //   - 引数で受け取ったtodoをそのまま返す
   function validateTodo(todo) {
 
-    try {
-      //テキストが空の時
-      if (todo.value === '') {
-        throw new Error('何も入力されていません');
-      };
-
-      //既に同名のタスクがある場合
-      todos.forEach(function (arrayElement) {
-        if (arrayElement === todo) {
-          throw new ErrorEvent('同じ名前のタスクは既に作成されています');
-        };
-      });
-
-    } catch (e) {
-      alert(e.name + ':' + e.message);
+    if (todo === '') {
+      throw new Error('何も入力されていません');
     };
+
+    todos.forEach(function (arrayElement) {
+      if (arrayElement === todo) {
+        throw new Error('同じ名前のタスクは既に作成されています');
+      };
+    });
+
+    return todo;
   }
 
 
@@ -86,18 +81,19 @@
 
     todos.forEach(function (todo, index) {
       const liElement = document.createElement('li');
-      const index2 = index + 1;
+      const taskNumber = index + 1;
 
-      liElement.textContent = index2 + ':' + todo;
+      ulElement.appendChild(liElement);
 
-      const removeButton = doucument.createElement('button');
+      liElement.textContent = taskNumber + ':' + todo;
+
+      const removeButton = document.createElement('button');
+      removeButton.textContent = '削除';
       removeButton.addEventListener('click', (event) => {
-        romiseTaskOfDeletingTodo(index);
+        promiseTaskOfDeletingTodo(index);
       });
 
       liElement.appendChild(removeButton);
-
-      ulElement.appendChild(liElement);
     });
   }
 
@@ -108,7 +104,7 @@
   // - 引数
   //   - index : 配列から削除したい要素のインデックス番号
   function deleteTodo(index) {
-    todos.splice(index, '1');
+    todos.splice(index, 1);
   }
 
   // `promiseTaskOfAddingTodo関数を実装する`
@@ -130,21 +126,13 @@
   function promiseTaskOfAddingTodo() {
     const promise = Promise.resolve();
     promise
-      .then(() => {
-        const todo = pickupTodoFromTextBox();
-      })
-      .then((todo) => {
-        validateTodo(todo);
-      })
-      .then(() => {
-        addTodo();
-      })
-      .then(() => {
-        showTodos();
-      })
+      .then(pickupTodoFromTextBox)
+      .then(validateTodo)
+      .then(addTodo)
+      .then(showTodos)
       .catch((error) => {
-        alert(error);
-      })
+        alert(error.message);
+      });
   }
 
 
@@ -161,16 +149,12 @@
   //   - index : 配列から削除したい要素のインデックス番号
   // - 戻り値
   //   - 無し
-  function promiseTaskOfDeletingTodo() {
+  function promiseTaskOfDeletingTodo(index) {
     const promise = Promise.resolve(index);
 
     promise
-      .then((index) => {
-        deleteTodo(index);
-      })
-      .then((index) => {
-        showTodos();
-      })
+      .then(deleteTodo)
+      .then(showTodos);
   }
 
 
@@ -178,5 +162,5 @@
   addButtonElement.addEventListener('click', (event) => {
     promiseTaskOfAddingTodo();
   });
-  
+
 })();
