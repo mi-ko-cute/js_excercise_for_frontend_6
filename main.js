@@ -40,12 +40,12 @@
 
     if (todo === '') {
       throw new Error('何も入力されていません');
-    };
+    }
 
     todos.forEach(function (arrayElement) {
       if (arrayElement === todo) {
         throw new Error('同じ名前のタスクは既に作成されています');
-      };
+      }
     });
 
     return todo;
